@@ -119,6 +119,10 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
         builder: (context, constraints) => Stack(
           alignment: Alignment.center,
           children: [
+            SizedBox(
+              height: widget.height ?? constraints.maxHeight,
+              width: widget.width ?? constraints.maxWidth,
+            ),
             AnimatedBuilder(
               animation: _cardAnimation,
               builder: (context, child) => ClipRRect(
