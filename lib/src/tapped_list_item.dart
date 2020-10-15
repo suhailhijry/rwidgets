@@ -1,16 +1,47 @@
 import 'package:flutter/material.dart';
 
+/// TappedListItem
+///
+/// A widget for use in lists views and listed containers.
 class TappedListItem extends StatefulWidget {
+  /// The item's title, cannot be null
   final Widget title;
+
+  /// The item's description, rendered with a thinner and lighter style than
+  /// that of the title.
   final Widget description;
+
+  /// Title and description style, provide one if you want to apply a custom
+  /// text styling.
   final TextStyle textStyle;
+
+  /// Contents of the leading icon that appears before the title and the
+  /// description.
   final Widget leadingIconContent;
+
+  /// Border radius of the leading icon. Prefer using [BorderRadius.circular].
   final BorderRadius leadingIconBorderRadius;
+
+  /// A widget that appears at the end, this widget should be an action that the
+  /// user can make.
   final Widget trailingAction;
+
+  /// Background color for the item, if not provided it is transparent.
   final Color backgroundColor;
+
+  /// Padding for the item's contents.
   final EdgeInsets padding;
+
+  /// Spacing between contents
   final EdgeInsets contentSpacing;
+
+  /// This affects the strength of the animation, higher values mean more intense
+  /// animations.
   final double animationScale;
+
+  /// A callback that is called when the user taps on the item. WARNING: the
+  /// callback is only called AFTER the animation is finished; this is to ensure
+  /// that animations feel contiguous, and not janky like in native android.
   final VoidCallback onTap;
 
   TappedListItem({
@@ -25,7 +56,7 @@ class TappedListItem extends StatefulWidget {
     this.contentSpacing,
     this.animationScale = 1.0,
     this.onTap,
-  });
+  }) : assert(title != null);
 
   @override
   _TappedListItemState createState() => _TappedListItemState();
