@@ -26,7 +26,7 @@ class TappedCard extends StatefulWidget {
   /// the card's height, or wrap the card in constraining widget.
   final double height;
 
-  /// Card's border radius. Prefer using [BorderRadius.circular]
+  /// Card's border radius. Prefer using [BorderRadius.circular].
   final BorderRadius borderRadius;
 
   /// A callback that is called after the user taps on the card. WARNING: the
