@@ -1,13 +1,37 @@
 import 'package:flutter/material.dart';
 
+/// TappedCard
+///
+/// A card similar to that of iOS's app store cards, with support for a little
+/// customization.
 class TappedCard extends StatefulWidget {
+  /// The card's background, can be any widget, it will get animated when users
+  /// tap on the card.
   final Widget background;
+
+  /// A title that appears at the bottom right corner of the card.
   final Text title;
+
+  /// Provide a style for the title to give it correct font or weight.
   final TextStyle titleStyle;
+
+  /// How far is title is going to be from the card corners.
   final double titlePadding;
+
+  /// Width of the card. Provide this when the parent has no constraints over
+  /// the card's width, or wrap the card in constraining widget.
   final double width;
+
+  /// Height of the card. Provide this when the parent has no constraints over
+  /// the card's height, or wrap the card in constraining widget.
   final double height;
+
+  /// Card's border radius. Prefer using [BorderRadius.circular]
   final BorderRadius borderRadius;
+
+  /// A callback that is called after the user taps on the card. WARNING: the
+  /// callback is only called AFTER the animation is finished; this is to ensure
+  /// that animations feel contiguous, and not janky like in native android.
   final VoidCallback onTap;
 
   TappedCard({
