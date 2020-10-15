@@ -1,3 +1,3 @@
-library beats_widgets;
+library rwidgets;
 
 export 'src/tapped_card.dart';

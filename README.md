@@ -1,3 +1,3 @@
-# beats_widgets
+# rwidgets
 
-Widgets used by Beats player app, and the authoring tools.
+A set of widgets I use in when creating flutter apps.
