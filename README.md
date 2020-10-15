@@ -1,3 +1,3 @@
 # rwidgets
 
-A set of widgets I use in when creating flutter apps.
+A set of widgets I use when creating flutter apps.
