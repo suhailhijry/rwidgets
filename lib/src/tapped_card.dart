@@ -115,6 +115,11 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
         _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
         _titleAnimation.animateTo(_titleAnimation.lowerBound);
       },
+      onTapCancel: () {
+        _cardController.animateTo(_cardController.upperBound);
+        _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
+        _titleAnimation.animateTo(_titleAnimation.lowerBound);
+      },
       child: LayoutBuilder(
         builder: (context, constraints) => Stack(
           alignment: Alignment.center,
