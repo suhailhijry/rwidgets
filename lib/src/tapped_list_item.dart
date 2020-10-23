@@ -42,6 +42,8 @@ class TappedListItem extends StatefulWidget {
   /// A callback that is called when the user taps on the item. WARNING: the
   /// callback is only called AFTER the animation is finished; this is to ensure
   /// that animations feel contiguous, and not janky like in native android.
+  ///
+  /// Note: if this is [null], no animation will occur.
   final VoidCallback onTap;
 
   TappedListItem({
@@ -122,13 +124,16 @@ class _TappedListItemState extends State<TappedListItem>
 
     return GestureDetector(
       onTapDown: (details) {
+        if (widget.onTap == null) return;
         _tapController.animateTo(_tapController.lowerBound);
       },
       onTapUp: (details) {
+        if (widget.onTap == null) return;
         _tapController.animateTo(_tapController.upperBound);
         _tapController.addStatusListener(onAnimationFinished);
       },
       onTapCancel: () {
+        if (widget.onTap == null) return;
         _tapController.animateTo(_tapController.upperBound);
       },
       child: LayoutBuilder(

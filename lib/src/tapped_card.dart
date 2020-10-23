@@ -32,6 +32,8 @@ class TappedCard extends StatefulWidget {
   /// A callback that is called after the user taps on the card. WARNING: the
   /// callback is only called AFTER the animation is finished; this is to ensure
   /// that animations feel contiguous, and not janky like in native android.
+  ///
+  /// Note: if this is [null], no animation will occur.
   final VoidCallback onTap;
 
   TappedCard({
@@ -105,17 +107,20 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (details) {
+        if (widget.onTap == null) return;
         _cardController.animateTo(_cardController.lowerBound);
         _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
         _titleAnimation.animateTo(_titleAnimation.upperBound);
       },
       onTapUp: (details) {
+        if (widget.onTap == null) return;
         _cardController.animateTo(_cardController.upperBound);
         _cardAnimation.addStatusListener(onCardAnimationFinished);
         _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
         _titleAnimation.animateTo(_titleAnimation.lowerBound);
       },
       onTapCancel: () {
+        if (widget.onTap == null) return;
         _cardController.animateTo(_cardController.upperBound);
         _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
         _titleAnimation.animateTo(_titleAnimation.lowerBound);
