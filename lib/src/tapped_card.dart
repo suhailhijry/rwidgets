@@ -29,6 +29,10 @@ class TappedCard extends StatefulWidget {
   /// Card's border radius. Prefer using [BorderRadius.circular].
   final BorderRadius borderRadius;
 
+  /// This affects the strength of the animation, higher values mean more intense
+  /// animations.
+  final double animationScale;
+
   /// A callback that is called after the user taps on the card. WARNING: the
   /// callback is only called AFTER the animation is finished; this is to ensure
   /// that animations feel contiguous, and not janky like in native android.
@@ -44,6 +48,7 @@ class TappedCard extends StatefulWidget {
     this.width,
     this.height,
     this.borderRadius,
+    this.animationScale = 1.0,
     this.onTap,
   });
 
@@ -55,14 +60,13 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
   AnimationController _cardController;
   AnimationController _backgroundAnimation;
   AnimationController _titleAnimation;
-  Animation _cardAnimation;
 
   @override
   void initState() {
     super.initState();
     _cardController = AnimationController(
       vsync: this,
-      lowerBound: 0.7,
+      lowerBound: 0.94 / widget.animationScale,
       upperBound: 1.0,
       value: 1.0,
       duration: Duration(milliseconds: 80),
@@ -70,7 +74,7 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
     _backgroundAnimation = AnimationController(
       vsync: this,
       lowerBound: 1.25,
-      upperBound: 1.40,
+      upperBound: 1.40 * widget.animationScale,
       value: 1.25,
       duration: Duration(milliseconds: 80),
     );
@@ -78,12 +82,8 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
       vsync: this,
       duration: Duration(milliseconds: 80),
       lowerBound: 1,
-      upperBound: 1.1,
-      value: 1.1,
-    );
-    _cardAnimation = CurvedAnimation(
-      curve: Curves.linearToEaseOut,
-      parent: _cardController,
+      upperBound: 1.1 * widget.animationScale,
+      value: 1,
     );
   }
 
@@ -100,7 +100,7 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
       widget.onTap?.call();
     }
 
-    _cardAnimation.removeStatusListener(onCardAnimationFinished);
+    _cardController.removeStatusListener(onCardAnimationFinished);
   }
 
   @override
@@ -115,7 +115,7 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
       onTapUp: (details) {
         if (widget.onTap == null) return;
         _cardController.animateTo(_cardController.upperBound);
-        _cardAnimation.addStatusListener(onCardAnimationFinished);
+        _cardController.addStatusListener(onCardAnimationFinished);
         _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
         _titleAnimation.animateTo(_titleAnimation.lowerBound);
       },
@@ -134,15 +134,15 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
               width: widget.width ?? constraints.maxWidth,
             ),
             AnimatedBuilder(
-              animation: _cardAnimation,
+              animation: _cardController,
               builder: (context, child) => ClipRRect(
                 clipBehavior: Clip.antiAlias,
                 borderRadius: widget.borderRadius ?? BorderRadius.circular(16),
                 child: SizedBox(
                   height: (widget.height ?? constraints.maxHeight) *
-                      _cardAnimation.value,
+                      _cardController.value,
                   width: (widget.width ?? constraints.maxWidth) *
-                      _cardAnimation.value,
+                      _cardController.value,
                   child: AnimatedBuilder(
                     animation: _backgroundAnimation,
                     builder: (context, child) => Transform.scale(
