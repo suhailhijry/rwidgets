@@ -134,6 +134,7 @@ class _TappedListItemState extends State<TappedListItem>
     return GestureDetector(
       onTap: () {
         if (widget.onTap == null) return;
+        Feedback.forTap(context);
         _tapController.animateTo(_tapController.lowerBound);
         _tapController.addStatusListener(reverseAnimation);
       },
@@ -143,6 +144,7 @@ class _TappedListItemState extends State<TappedListItem>
       },
       onTapUp: (details) {
         if (widget.onTap == null) return;
+        Feedback.forTap(context);
         _tapController.animateTo(_tapController.upperBound);
         _tapController.addStatusListener(onAnimationFinished);
       },
