@@ -95,105 +95,80 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void onCardAnimationFinished(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
-      widget.onTap?.call();
-    }
-
-    _cardController.removeStatusListener(onCardAnimationFinished);
-  }
-
-  void reverseAnimation(AnimationStatus status) {
-    if (status == AnimationStatus.completed) {
-      _cardController.animateTo(_cardController.upperBound);
-      _cardController.addStatusListener(onCardAnimationFinished);
-      _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
-      _titleAnimation.animateTo(_titleAnimation.lowerBound);
-    }
-
-    _cardController.removeStatusListener(reverseAnimation);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        if (widget.onTap == null) return;
-        Feedback.forTap(context);
-        _cardController.animateTo(_cardController.lowerBound);
-        _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
-        _cardController.addStatusListener(reverseAnimation);
-        _titleAnimation.animateTo(_titleAnimation.upperBound);
-      },
-      onTapDown: (details) {
-        if (widget.onTap == null) return;
-        _cardController.animateTo(_cardController.lowerBound);
-        _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
-        _titleAnimation.animateTo(_titleAnimation.upperBound);
-      },
-      onTapUp: (details) {
-        if (widget.onTap == null) return;
-        Feedback.forTap(context);
-        _cardController.animateTo(_cardController.upperBound);
-        _cardController.addStatusListener(onCardAnimationFinished);
-        _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
-        _titleAnimation.animateTo(_titleAnimation.lowerBound);
-      },
-      onTapCancel: () {
-        if (widget.onTap == null) return;
-        _cardController.animateTo(_cardController.upperBound);
-        _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
-        _titleAnimation.animateTo(_titleAnimation.lowerBound);
-      },
-      child: LayoutBuilder(
-        builder: (context, constraints) => Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              height: widget.height ?? constraints.maxHeight,
-              width: widget.width ?? constraints.maxWidth,
-            ),
-            AnimatedBuilder(
-              animation: _cardController,
-              builder: (context, child) => ClipRRect(
-                clipBehavior: Clip.antiAlias,
-                borderRadius: widget.borderRadius ?? BorderRadius.circular(16),
-                child: SizedBox(
-                  height: (widget.height ?? constraints.maxHeight) *
-                      _cardController.value,
-                  width: (widget.width ?? constraints.maxWidth) *
-                      _cardController.value,
-                  child: AnimatedBuilder(
-                    animation: _backgroundAnimation,
-                    builder: (context, child) => Transform.scale(
-                      scale: _backgroundAnimation.value,
-                      child: widget.background,
+    return AbsorbPointer(
+      absorbing: widget.onTap == null,
+      child: GestureDetector(
+        onTapDown: (details) {
+          _cardController.animateTo(_cardController.lowerBound);
+          _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
+          _titleAnimation.animateTo(_titleAnimation.upperBound);
+        },
+        onTapUp: (details) {
+          _cardController
+              .animateTo(_cardController.upperBound)
+              .whenCompleteOrCancel(widget.onTap);
+          _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
+          _titleAnimation.animateTo(_titleAnimation.lowerBound);
+          Feedback.forTap(context);
+        },
+        onTapCancel: () {
+          _cardController.animateTo(_cardController.upperBound);
+          _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
+          _titleAnimation.animateTo(_titleAnimation.lowerBound);
+        },
+        child: LayoutBuilder(
+          builder: (context, constraints) => Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                height: widget.height ?? constraints.maxHeight,
+                width: widget.width ?? constraints.maxWidth,
+              ),
+              AnimatedBuilder(
+                animation: _cardController,
+                builder: (context, child) => ClipRRect(
+                  clipBehavior: Clip.antiAlias,
+                  borderRadius:
+                      widget.borderRadius ?? BorderRadius.circular(16),
+                  child: SizedBox(
+                    height: (widget.height ?? constraints.maxHeight) *
+                        _cardController.value,
+                    width: (widget.width ?? constraints.maxWidth) *
+                        _cardController.value,
+                    child: AnimatedBuilder(
+                      animation: _backgroundAnimation,
+                      builder: (context, child) => Transform.scale(
+                        scale: _backgroundAnimation.value,
+                        child: widget.background,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            if (widget.title != null)
-              AnimatedBuilder(
-                animation: _titleAnimation,
-                builder: (context, child) => Positioned(
-                  bottom: widget.titlePadding,
-                  right: widget.titlePadding,
-                  child: DefaultTextStyle.merge(
-                    style: widget.titleStyle?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: widget.titleStyle.fontSize *
-                              _titleAnimation.value,
-                        ) ??
-                        TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16 * _titleAnimation.value,
-                        ),
-                    child: widget.title,
+              if (widget.title != null)
+                AnimatedBuilder(
+                  animation: _titleAnimation,
+                  builder: (context, child) => Positioned(
+                    bottom: widget.titlePadding,
+                    right: widget.titlePadding,
+                    child: DefaultTextStyle.merge(
+                      style: widget.titleStyle?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            fontSize: widget.titleStyle.fontSize *
+                                _titleAnimation.value,
+                          ) ??
+                          TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16 * _titleAnimation.value,
+                          ),
+                      child: widget.title,
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
