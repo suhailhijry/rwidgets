@@ -103,9 +103,27 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
     _cardController.removeStatusListener(onCardAnimationFinished);
   }
 
+  void reverseAnimation(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      _cardController.animateTo(_cardController.upperBound);
+      _cardController.addStatusListener(onCardAnimationFinished);
+      _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
+      _titleAnimation.animateTo(_titleAnimation.lowerBound);
+    }
+
+    _cardController.removeStatusListener(reverseAnimation);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        if (widget.onTap == null) return;
+        _cardController.animateTo(_cardController.lowerBound);
+        _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
+        _cardController.addStatusListener(reverseAnimation);
+        _titleAnimation.animateTo(_titleAnimation.upperBound);
+      },
       onTapDown: (details) {
         if (widget.onTap == null) return;
         _cardController.animateTo(_cardController.lowerBound);

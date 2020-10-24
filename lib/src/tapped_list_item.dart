@@ -94,6 +94,15 @@ class _TappedListItemState extends State<TappedListItem>
     _tapController.removeStatusListener(onAnimationFinished);
   }
 
+  void reverseAnimation(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      _tapController.animateTo(_tapController.upperBound);
+      _tapController.addStatusListener(onAnimationFinished);
+    }
+
+    _tapController.removeStatusListener(reverseAnimation);
+  }
+
   @override
   Widget build(BuildContext context) {
     final textStyle =
@@ -123,6 +132,11 @@ class _TappedListItemState extends State<TappedListItem>
     final contentSpacing = widget.contentSpacing ?? EdgeInsets.all(8);
 
     return GestureDetector(
+      onTap: () {
+        if (widget.onTap == null) return;
+        _tapController.animateTo(_tapController.lowerBound);
+        _tapController.addStatusListener(reverseAnimation);
+      },
       onTapDown: (details) {
         if (widget.onTap == null) return;
         _tapController.animateTo(_tapController.lowerBound);
