@@ -10,7 +10,7 @@ class TappedCard extends StatefulWidget {
   final Widget background;
 
   /// A title that appears at the bottom right corner of the card.
-  final Text title;
+  final Widget title;
 
   /// Provide a style for the title to give it correct font or weight.
   final TextStyle titleStyle;
