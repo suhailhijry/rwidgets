@@ -114,79 +114,79 @@ class _TappedListItemState extends State<TappedListItem>
 
     final contentSpacing = widget.contentSpacing ?? EdgeInsets.all(8);
 
-    return AbsorbPointer(
-      absorbing: widget.onTap == null,
-      child: GestureDetector(
-        onTapDown: (details) {
-          _tapController.animateTo(_tapController.lowerBound);
-        },
-        onTapUp: (details) {
-          _tapController
-              .animateTo(_tapController.upperBound)
-              .whenCompleteOrCancel(widget.onTap);
-          Feedback.forTap(context);
-        },
-        onTapCancel: () {
-          _tapController.animateTo(_tapController.upperBound);
-        },
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return AnimatedBuilder(
-              animation: _tapController,
-              builder: (context, child) => Transform.scale(
-                scale: _tapController.value,
-                child: Container(
-                  padding: widget.padding ?? contentSpacing,
-                  width: constraints.maxWidth,
-                  color: widget.backgroundColor,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+      onTapDown: (details) {
+        if (widget.onTap == null) return;
+        _tapController.animateTo(_tapController.lowerBound);
+      },
+      onTapUp: (details) {
+        if (widget.onTap == null) return;
+        _tapController
+            .animateTo(_tapController.upperBound)
+            .whenCompleteOrCancel(widget.onTap);
+        Feedback.forTap(context);
+      },
+      onTapCancel: () {
+        if (widget.onTap == null) return;
+        _tapController.animateTo(_tapController.upperBound);
+      },
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return AnimatedBuilder(
+            animation: _tapController,
+            child: Container(
+              padding: widget.padding ?? contentSpacing,
+              width: constraints.maxWidth,
+              color: widget.backgroundColor,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          if (widget.leadingIconContent != null)
-                            ClipRRect(
-                              clipBehavior: Clip.antiAlias,
-                              borderRadius: widget.leadingIconBorderRadius ??
-                                  BorderRadius.circular(8),
-                              child: SizedBox(
-                                height: 36,
-                                width: 36,
-                                child: widget.leadingIconContent,
-                              ),
-                            ),
-                          descriptionWidget != null
-                              ? Container(
-                                  margin: contentSpacing,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      titleWidget,
-                                      descriptionWidget,
-                                    ],
-                                  ),
-                                )
-                              : Container(
-                                  margin: contentSpacing,
-                                  alignment: Alignment.centerLeft,
-                                  child: titleWidget,
-                                ),
-                        ],
-                      ),
-                      if (widget.trailingAction != null)
-                        Container(
-                          margin: contentSpacing,
-                          alignment: Alignment.centerRight,
-                          child: widget.trailingAction,
+                      if (widget.leadingIconContent != null)
+                        ClipRRect(
+                          clipBehavior: Clip.antiAlias,
+                          borderRadius: widget.leadingIconBorderRadius ??
+                              BorderRadius.circular(8),
+                          child: SizedBox(
+                            height: 36,
+                            width: 36,
+                            child: widget.leadingIconContent,
+                          ),
                         ),
+                      descriptionWidget != null
+                          ? Container(
+                              margin: contentSpacing,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  titleWidget,
+                                  descriptionWidget,
+                                ],
+                              ),
+                            )
+                          : Container(
+                              margin: contentSpacing,
+                              alignment: Alignment.centerLeft,
+                              child: titleWidget,
+                            ),
                     ],
                   ),
-                ),
+                  if (widget.trailingAction != null)
+                    Container(
+                      margin: contentSpacing,
+                      alignment: Alignment.centerRight,
+                      child: widget.trailingAction,
+                    ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+            builder: (context, child) => Transform.scale(
+              scale: _tapController.value,
+              child: child,
+            ),
+          );
+        },
       ),
     );
   }
