@@ -86,6 +86,9 @@ class _TappedListItemState extends State<TappedListItem>
     super.dispose();
   }
 
+  TickerFuture _tapTicker;
+  TickerFuture _upTicker;
+
   @override
   Widget build(BuildContext context) {
     final textStyle =
@@ -117,18 +120,27 @@ class _TappedListItemState extends State<TappedListItem>
     return GestureDetector(
       onTapDown: (details) {
         if (widget.onTap == null) return;
-        _tapController.animateTo(_tapController.lowerBound);
+        if (_upTicker != null) {
+          _upTicker.whenComplete(() {
+            _tapTicker = _tapController.animateTo(_tapController.lowerBound);
+          });
+        } else {
+          _tapTicker = _tapController.animateTo(_tapController.lowerBound);
+        }
       },
-      onTapUp: (details) {
+      onTapUp: (details) async {
         if (widget.onTap == null) return;
-        _tapController
-            .animateTo(_tapController.upperBound)
-            .whenCompleteOrCancel(widget.onTap);
+        _tapTicker.whenComplete(() {
+          _upTicker = _tapController.animateTo(_tapController.upperBound)
+            ..whenComplete(widget.onTap);
+        });
         Feedback.forTap(context);
       },
       onTapCancel: () {
         if (widget.onTap == null) return;
-        _tapController.animateTo(_tapController.upperBound);
+        _tapTicker.whenComplete(() {
+          _upTicker = _tapController.animateTo(_tapController.upperBound);
+        });
       },
       child: LayoutBuilder(
         builder: (context, constraints) {

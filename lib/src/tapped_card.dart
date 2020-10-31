@@ -95,28 +95,43 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  TickerFuture _tapTicker;
+  TickerFuture _upTicker;
+
   @override
   Widget build(BuildContext context) {
     return AbsorbPointer(
       absorbing: widget.onTap == null,
       child: GestureDetector(
         onTapDown: (details) {
-          _cardController.animateTo(_cardController.lowerBound);
-          _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
-          _titleAnimation.animateTo(_titleAnimation.upperBound);
+          if (_upTicker != null) {
+            _upTicker.whenComplete(() {
+              _tapTicker =
+                  _cardController.animateTo(_cardController.lowerBound);
+              _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
+              _titleAnimation.animateTo(_titleAnimation.upperBound);
+            });
+          } else {
+            _tapTicker = _cardController.animateTo(_cardController.lowerBound);
+            _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
+            _titleAnimation.animateTo(_titleAnimation.upperBound);
+          }
         },
         onTapUp: (details) {
-          _cardController
-              .animateTo(_cardController.upperBound)
-              .whenCompleteOrCancel(widget.onTap);
-          _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
-          _titleAnimation.animateTo(_titleAnimation.lowerBound);
+          _tapTicker.whenComplete(() {
+            _upTicker = _cardController.animateTo(_cardController.upperBound)
+              ..whenComplete(widget.onTap);
+            _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
+            _titleAnimation.animateTo(_titleAnimation.lowerBound);
+          });
           Feedback.forTap(context);
         },
         onTapCancel: () {
-          _cardController.animateTo(_cardController.upperBound);
-          _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
-          _titleAnimation.animateTo(_titleAnimation.lowerBound);
+          _tapTicker.whenComplete(() {
+            _upTicker = _cardController.animateTo(_cardController.upperBound);
+            _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
+            _titleAnimation.animateTo(_titleAnimation.lowerBound);
+          });
         },
         child: LayoutBuilder(
           builder: (context, constraints) => Stack(
