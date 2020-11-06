@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 /// TappedCard
 ///
@@ -102,87 +103,98 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return AbsorbPointer(
       absorbing: widget.onTap == null,
-      child: GestureDetector(
-        onTapDown: (details) {
-          if (_upTicker != null) {
-            _upTicker.whenComplete(() {
-              _tapTicker =
-                  _cardController.animateTo(_cardController.lowerBound);
-              _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
-              _titleAnimation.animateTo(_titleAnimation.upperBound);
-            });
-          } else {
-            _tapTicker = _cardController.animateTo(_cardController.lowerBound);
-            _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
-            _titleAnimation.animateTo(_titleAnimation.upperBound);
-          }
-        },
-        onTapUp: (details) {
-          _tapTicker.whenComplete(() {
-            _upTicker = _cardController.animateTo(_cardController.upperBound)
-              ..whenComplete(widget.onTap);
-            _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
-            _titleAnimation.animateTo(_titleAnimation.lowerBound);
-          });
-          Feedback.forTap(context);
-        },
-        onTapCancel: () {
-          _tapTicker.whenComplete(() {
-            _upTicker = _cardController.animateTo(_cardController.upperBound);
-            _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
-            _titleAnimation.animateTo(_titleAnimation.lowerBound);
-          });
-        },
-        child: LayoutBuilder(
-          builder: (context, constraints) => Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                height: widget.height ?? constraints.maxHeight,
-                width: widget.width ?? constraints.maxWidth,
-              ),
-              AnimatedBuilder(
-                animation: _cardController,
-                builder: (context, child) => ClipRRect(
-                  clipBehavior: Clip.antiAlias,
-                  borderRadius:
-                      widget.borderRadius ?? BorderRadius.circular(16),
-                  child: SizedBox(
-                    height: (widget.height ?? constraints.maxHeight) *
-                        _cardController.value,
-                    width: (widget.width ?? constraints.maxWidth) *
-                        _cardController.value,
-                    child: AnimatedBuilder(
-                      animation: _backgroundAnimation,
-                      builder: (context, child) => Transform.scale(
-                        scale: _backgroundAnimation.value,
-                        child: widget.background,
+      child: InkResponse(
+        mouseCursor: SystemMouseCursors.click,
+        child: Semantics(
+          button: true,
+          enabled: widget.onTap != null,
+          child: GestureDetector(
+            onTapDown: (details) {
+              if (_upTicker != null) {
+                _upTicker.whenComplete(() {
+                  _tapTicker =
+                      _cardController.animateTo(_cardController.lowerBound);
+                  _backgroundAnimation
+                      .animateTo(_backgroundAnimation.upperBound);
+                  _titleAnimation.animateTo(_titleAnimation.upperBound);
+                });
+              } else {
+                _tapTicker =
+                    _cardController.animateTo(_cardController.lowerBound);
+                _backgroundAnimation.animateTo(_backgroundAnimation.upperBound);
+                _titleAnimation.animateTo(_titleAnimation.upperBound);
+              }
+            },
+            onTapUp: (details) {
+              _tapTicker.whenComplete(() {
+                _upTicker = _cardController
+                    .animateTo(_cardController.upperBound)
+                      ..whenComplete(widget.onTap);
+                _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
+                _titleAnimation.animateTo(_titleAnimation.lowerBound);
+              });
+              Feedback.forTap(context);
+            },
+            onTapCancel: () {
+              _tapTicker.whenComplete(() {
+                _upTicker =
+                    _cardController.animateTo(_cardController.upperBound);
+                _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
+                _titleAnimation.animateTo(_titleAnimation.lowerBound);
+              });
+            },
+            child: LayoutBuilder(
+              builder: (context, constraints) => Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: widget.height ?? constraints.maxHeight,
+                    width: widget.width ?? constraints.maxWidth,
+                  ),
+                  AnimatedBuilder(
+                    animation: _cardController,
+                    builder: (context, child) => ClipRRect(
+                      clipBehavior: Clip.antiAlias,
+                      borderRadius:
+                          widget.borderRadius ?? BorderRadius.circular(16),
+                      child: SizedBox(
+                        height: (widget.height ?? constraints.maxHeight) *
+                            _cardController.value,
+                        width: (widget.width ?? constraints.maxWidth) *
+                            _cardController.value,
+                        child: AnimatedBuilder(
+                          animation: _backgroundAnimation,
+                          builder: (context, child) => Transform.scale(
+                            scale: _backgroundAnimation.value,
+                            child: widget.background,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              if (widget.title != null)
-                AnimatedBuilder(
-                  animation: _titleAnimation,
-                  builder: (context, child) => Positioned(
-                    bottom: widget.titlePadding,
-                    right: widget.titlePadding,
-                    child: DefaultTextStyle.merge(
-                      style: widget.titleStyle?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            fontSize: widget.titleStyle.fontSize *
-                                _titleAnimation.value,
-                          ) ??
-                          TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16 * _titleAnimation.value,
-                          ),
-                      child: widget.title,
+                  if (widget.title != null)
+                    AnimatedBuilder(
+                      animation: _titleAnimation,
+                      builder: (context, child) => Positioned(
+                        bottom: widget.titlePadding,
+                        right: widget.titlePadding,
+                        child: DefaultTextStyle.merge(
+                          style: widget.titleStyle?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: widget.titleStyle.fontSize *
+                                    _titleAnimation.value,
+                              ) ??
+                              TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16 * _titleAnimation.value,
+                              ),
+                          child: widget.title,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
