@@ -6,12 +6,12 @@ import 'package:intl/intl.dart' as intl;
 /// this is just a temporary text field implementation, I am currently brainstorming
 /// a much better implementation.
 class TextFieldEx extends StatefulWidget {
-  final String initialText;
-  final String hintText;
-  final void Function(String) onValueChanged;
-  final void Function(String) onSubmitted;
-  final bool Function(String) onValidateInput;
-  final String errorString;
+  final String? initialText;
+  final String? hintText;
+  final void Function(String)? onValueChanged;
+  final void Function(String)? onSubmitted;
+  final bool Function(String)? onValidateInput;
+  final String? errorString;
   final TextInputAction submitAction;
   final TextDirection initialTextDirection;
   final TextAlign initialTextAlignment;
@@ -35,11 +35,11 @@ class TextFieldEx extends StatefulWidget {
 }
 
 class _TextFieldExState extends State<TextFieldEx> {
-  TextEditingController _controller;
-  FocusNode _focusNode;
-  TextDirection _textDirection;
-  TextAlign _textAlign;
-  String _error;
+  late final TextEditingController _controller;
+  final FocusNode _focusNode = FocusNode();
+  late TextDirection _textDirection;
+  late TextAlign _textAlign;
+  String? _error;
 
   bool _isValueValid(String value) {
     return widget.onValidateInput?.call(value) ?? true;
@@ -74,17 +74,14 @@ class _TextFieldExState extends State<TextFieldEx> {
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.initialText);
-    _textDirection = TextDirection.ltr;
-    _textAlign = TextAlign.left;
-    _focusNode = FocusNode();
     _textDirection = widget.initialTextDirection;
     _textAlign = widget.initialTextAlignment;
   }
 
   @override
   void dispose() {
-    _focusNode?.dispose();
-    _controller?.dispose();
+    _focusNode.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -118,9 +115,11 @@ class _TextFieldExState extends State<TextFieldEx> {
           widget.onSubmitted?.call(value);
           _controller.text = value;
         } else {
-          widget.onSubmitted?.call(widget.initialText);
-          _controller.text = widget.initialText;
-          _onValueChanged(widget.initialText);
+          if (widget.initialText != null) {
+            widget.onSubmitted?.call(widget.initialText!);
+            _controller.text = widget.initialText!;
+            _onValueChanged(widget.initialText!);
+          }
         }
       },
     );

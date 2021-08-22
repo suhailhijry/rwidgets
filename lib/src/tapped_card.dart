@@ -11,24 +11,24 @@ class TappedCard extends StatefulWidget {
   final Widget background;
 
   /// A title that appears at the bottom right corner of the card.
-  final Widget title;
+  final Widget? title;
 
   /// Provide a style for the title to give it correct font or weight.
-  final TextStyle titleStyle;
+  final TextStyle? titleStyle;
 
   /// How far is title is going to be from the card corners.
   final double titlePadding;
 
   /// Width of the card. Provide this when the parent has no constraints over
   /// the card's width, or wrap the card in constraining widget.
-  final double width;
+  final double? width;
 
   /// Height of the card. Provide this when the parent has no constraints over
   /// the card's height, or wrap the card in constraining widget.
-  final double height;
+  final double? height;
 
   /// Card's border radius. Prefer using [BorderRadius.circular].
-  final BorderRadius borderRadius;
+  final BorderRadius? borderRadius;
 
   /// This affects the strength of the animation, higher values mean more intense
   /// animations.
@@ -39,10 +39,10 @@ class TappedCard extends StatefulWidget {
   /// that animations feel contiguous, and not janky like in native android.
   ///
   /// Note: if this is [null], no animation will occur.
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   TappedCard({
-    @required this.background,
+    required this.background,
     this.title,
     this.titleStyle,
     this.titlePadding = 16,
@@ -58,9 +58,9 @@ class TappedCard extends StatefulWidget {
 }
 
 class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
-  AnimationController _cardController;
-  AnimationController _backgroundAnimation;
-  AnimationController _titleAnimation;
+  late final AnimationController _cardController;
+  late final AnimationController _backgroundAnimation;
+  late final AnimationController _titleAnimation;
 
   @override
   void initState() {
@@ -96,8 +96,8 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  TickerFuture _tapTicker;
-  TickerFuture _upTicker;
+  TickerFuture? _tapTicker;
+  TickerFuture? _upTicker;
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,7 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
           child: GestureDetector(
             onTapDown: (details) {
               if (_upTicker != null) {
-                _upTicker.whenComplete(() {
+                _upTicker?.whenComplete(() {
                   _tapTicker =
                       _cardController.animateTo(_cardController.lowerBound);
                   _backgroundAnimation
@@ -126,17 +126,19 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
               }
             },
             onTapUp: (details) {
-              _tapTicker.whenComplete(() {
-                _upTicker = _cardController
-                    .animateTo(_cardController.upperBound)
-                      ..whenComplete(widget.onTap);
+              _tapTicker?.whenComplete(() {
+                _upTicker =
+                    _cardController.animateTo(_cardController.upperBound);
+                if (widget.onTap != null) {
+                  _upTicker?.whenComplete(widget.onTap!);
+                }
                 _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
                 _titleAnimation.animateTo(_titleAnimation.lowerBound);
               });
               Feedback.forTap(context);
             },
             onTapCancel: () {
-              _tapTicker.whenComplete(() {
+              _tapTicker?.whenComplete(() {
                 _upTicker =
                     _cardController.animateTo(_cardController.upperBound);
                 _backgroundAnimation.animateTo(_backgroundAnimation.lowerBound);
@@ -181,14 +183,14 @@ class _TappedCardState extends State<TappedCard> with TickerProviderStateMixin {
                         child: DefaultTextStyle.merge(
                           style: widget.titleStyle?.copyWith(
                                 fontWeight: FontWeight.w600,
-                                fontSize: widget.titleStyle.fontSize *
+                                fontSize: widget.titleStyle!.fontSize! *
                                     _titleAnimation.value,
                               ) ??
                               TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16 * _titleAnimation.value,
                               ),
-                          child: widget.title,
+                          child: widget.title!,
                         ),
                       ),
                     ),

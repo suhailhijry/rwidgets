@@ -9,31 +9,31 @@ class TappedListItem extends StatefulWidget {
 
   /// The item's description, rendered with a thinner and lighter style than
   /// that of the title.
-  final Widget description;
+  final Widget? description;
 
   /// Title and description style, provide one if you want to apply a custom
   /// text styling.
-  final TextStyle textStyle;
+  final TextStyle? textStyle;
 
   /// Contents of the leading icon that appears before the title and the
   /// description.
-  final Widget leadingIconContent;
+  final Widget? leadingIconContent;
 
   /// Border radius of the leading icon. Prefer using [BorderRadius.circular].
-  final BorderRadius leadingIconBorderRadius;
+  final BorderRadius? leadingIconBorderRadius;
 
   /// A widget that appears at the end, this widget should be an action that the
   /// user can make.
-  final Widget trailingAction;
+  final Widget? trailingAction;
 
   /// Background color for the item, if not provided it is transparent.
   final Color backgroundColor;
 
   /// Padding for the item's contents.
-  final EdgeInsets padding;
+  final EdgeInsets? padding;
 
   /// Spacing between contents
-  final EdgeInsets contentSpacing;
+  final EdgeInsets? contentSpacing;
 
   /// This affects the strength of the animation, higher values mean more intense
   /// animations.
@@ -44,10 +44,10 @@ class TappedListItem extends StatefulWidget {
   /// that animations feel contiguous, and not janky like in native android.
   ///
   /// Note: if this is [null], no animation will occur.
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   TappedListItem({
-    @required this.title,
+    required this.title,
     this.description,
     this.textStyle,
     this.leadingIconContent,
@@ -66,7 +66,7 @@ class TappedListItem extends StatefulWidget {
 
 class _TappedListItemState extends State<TappedListItem>
     with TickerProviderStateMixin {
-  AnimationController _tapController;
+  late final AnimationController _tapController;
 
   @override
   void initState() {
@@ -86,21 +86,21 @@ class _TappedListItemState extends State<TappedListItem>
     super.dispose();
   }
 
-  TickerFuture _tapTicker;
-  TickerFuture _upTicker;
+  TickerFuture? _tapTicker;
+  TickerFuture? _upTicker;
 
   @override
   Widget build(BuildContext context) {
     final textStyle =
         (widget.textStyle ?? Theme.of(context).textTheme.headline6);
-    final titleStyle = textStyle.copyWith(
+    final titleStyle = textStyle!.copyWith(
       fontWeight: FontWeight.w700,
     );
     final descriptionStyle = widget.description == null
         ? null
         : textStyle.copyWith(
             fontWeight: FontWeight.w300,
-            fontSize: textStyle.fontSize * 0.7,
+            fontSize: textStyle.fontSize! * 0.7,
           );
     final titleWidget = DefaultTextStyle.merge(
       textAlign: TextAlign.left,
@@ -112,7 +112,7 @@ class _TappedListItemState extends State<TappedListItem>
         : DefaultTextStyle.merge(
             textAlign: TextAlign.left,
             style: descriptionStyle,
-            child: widget.description,
+            child: widget.description!,
           );
 
     final contentSpacing = widget.contentSpacing ?? EdgeInsets.all(8);
@@ -121,7 +121,7 @@ class _TappedListItemState extends State<TappedListItem>
       onTapDown: (details) {
         if (widget.onTap == null) return;
         if (_upTicker != null) {
-          _upTicker.whenComplete(() {
+          _upTicker?.whenComplete(() {
             _tapTicker = _tapController.animateTo(_tapController.lowerBound);
           });
         } else {
@@ -130,15 +130,15 @@ class _TappedListItemState extends State<TappedListItem>
       },
       onTapUp: (details) async {
         if (widget.onTap == null) return;
-        _tapTicker.whenComplete(() {
+        _tapTicker?.whenComplete(() {
           _upTicker = _tapController.animateTo(_tapController.upperBound)
-            ..whenComplete(widget.onTap);
+            ..whenComplete(widget.onTap!);
         });
         Feedback.forTap(context);
       },
       onTapCancel: () {
         if (widget.onTap == null) return;
-        _tapTicker.whenComplete(() {
+        _tapTicker?.whenComplete(() {
           _upTicker = _tapController.animateTo(_tapController.upperBound);
         });
       },
